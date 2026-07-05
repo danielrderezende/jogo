@@ -6,11 +6,15 @@
     <title>Loteria Inteligente + Estatísticas</title>
     <style>
         :root {
+            /* Cores padrão (Mega-Sena) */
             --primary: #1f8b5a;
             --primary-dark: #146a44;
             --primary-light: #2e7d5e;
+            --primary-pale: #e6f0ea;
             --bg-color: #0b2b1e;
             --text-main: #1e3b2a;
+            
+            /* Cores fixas de UI */
             --text-muted: #5a7a68;
             --danger: #e74c3c;
             --info: #3498db;
@@ -24,13 +28,15 @@
 
         body {
             font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-            background: linear-gradient(145deg, var(--bg-color) 0%, #1a4a33 100%);
+            background: linear-gradient(145deg, var(--bg-color) 0%, var(--primary-dark) 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
             color: var(--text-main);
+            /* Transição suave de fundo */
+            transition: background 0.6s ease;
         }
 
         .container {
@@ -63,9 +69,10 @@
             font-weight: 500;
             color: var(--primary-light);
             margin-left: auto;
-            background: #e6f0ea;
+            background: var(--primary-pale);
             padding: 4px 12px;
             border-radius: 20px;
+            transition: all 0.4s ease;
         }
 
         .subtitle {
@@ -74,6 +81,7 @@
             border-left: 4px solid var(--primary-light);
             padding-left: 14px;
             font-weight: 400;
+            transition: border-color 0.4s ease;
         }
 
         /* Formulário */
@@ -176,7 +184,7 @@
             padding: 12px 20px;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.2s;
+            transition: all 0.4s ease;
         }
 
         .btn-add:hover {
@@ -223,13 +231,13 @@
             font-weight: 700;
             letter-spacing: 0.5px;
             cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 8px 20px rgba(26, 74, 51, 0.3);
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
 
         .btn-generate:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 25px rgba(26, 74, 51, 0.4);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
         }
         
         .btn-generate:active {
@@ -258,9 +266,10 @@
             border-left: 6px solid var(--primary);
             position: relative;
             animation: fadeIn 0.4s ease-out;
+            transition: border-color 0.4s ease;
         }
 
-        /* Novas Bolas de Loteria */
+        /* Bolas de Loteria Adaptáveis */
         .game-card .numbers {
             display: flex;
             flex-wrap: wrap;
@@ -269,7 +278,7 @@
         }
 
         .game-card .numbers span {
-            background: radial-gradient(circle at 30% 30%, #ffffff, #e6f0ea);
+            background: radial-gradient(circle at 30% 30%, #ffffff, var(--primary-pale));
             width: 42px;
             height: 42px;
             display: flex;
@@ -279,8 +288,9 @@
             font-size: 1.1rem;
             font-weight: 700;
             color: var(--text-main);
-            box-shadow: inset -2px -2px 6px rgba(0,0,0,0.1), 0 3px 6px rgba(0,0,0,0.1);
-            border: 1px solid #d0e0d6;
+            box-shadow: inset -2px -2px 6px rgba(0,0,0,0.05), 0 3px 6px rgba(0,0,0,0.1);
+            border: 1px solid var(--primary-pale);
+            transition: all 0.4s ease;
         }
 
         .copy-btn {
@@ -319,12 +329,13 @@
         .game-card .prob {
             margin-top: 10px;
             font-size: 0.9rem;
-            background: #e6f0ea;
+            background: var(--primary-pale);
             padding: 8px 16px;
             border-radius: 8px;
             display: inline-block;
             font-weight: 600;
             color: var(--primary-dark);
+            transition: all 0.4s ease;
         }
 
         .no-games {
@@ -370,7 +381,8 @@
             justify-content: space-between;
             align-items: center;
             border: 1px solid #eef4f0;
-            border-left: 4px solid #a8c9b6;
+            border-left: 4px solid var(--primary-light);
+            transition: border-color 0.4s ease;
         }
 
         .history-item .h-nums { font-weight: 700; letter-spacing: 1px; }
@@ -411,13 +423,13 @@
             border-radius: 12px;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.2s;
+            transition: all 0.4s ease;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .btn-stats:hover { background: #2c523b; }
+        .btn-stats:hover { opacity: 0.9; transform: scale(1.02); }
 
         .stats-summary {
             display: flex;
@@ -449,13 +461,14 @@
         }
 
         th {
-            background: #e6f0ea;
+            background: var(--primary-pale);
             color: var(--text-main);
             font-weight: 700;
             padding: 14px 16px;
             position: sticky;
             top: 0;
             z-index: 2;
+            transition: background 0.4s ease;
         }
 
         td {
@@ -472,7 +485,7 @@
             border-radius: 10px;
             background: linear-gradient(90deg, var(--primary-light), var(--primary));
             min-width: 4px;
-            transition: width 1s ease-out;
+            transition: width 1s ease-out, background 0.4s ease;
         }
 
         .badge {
@@ -545,6 +558,7 @@
     </h1>
     <div class="subtitle">Gere jogos otimizados e consulte tendências matemáticas.</div>
 
+    <!-- FORMULÁRIO -->
     <div class="form-grid">
         <div class="field">
             <label for="loteriaSelect">Modalidade</label>
@@ -586,12 +600,14 @@
 
     <button class="btn-generate" id="gerarBtn">🚀 Gerar Palpites</button>
 
+    <!-- RESULTADOS -->
     <div class="result-area" id="resultArea">
         <div class="game-list" id="gameList">
             <div class="no-games">Aguardando geração de jogos...</div>
         </div>
     </div>
 
+    <!-- HISTÓRICO -->
     <div class="history-area">
         <details>
             <summary>📋 Histórico de Palpites Gerados</summary>
@@ -602,6 +618,7 @@
         </details>
     </div>
 
+    <!-- ESTATÍSTICAS -->
     <div class="stats-area" id="statsArea">
         <div class="stats-header">
             <h3>📊 Mapa de Frequência (Simulação)</h3>
@@ -638,13 +655,32 @@
     (function() {
         "use strict";
 
+        // ----- PALETA DE CORES DINÂMICA -----
         const LOTERIAS = {
-            megasena:   { nome: 'Mega-Sena', total: 60, min: 6, max: 20, premio: 6 },
-            lotofacil:  { nome: 'Lotofácil', total: 25, min: 15, max: 20, premio: 15 },
-            quina:      { nome: 'Quina', total: 80, min: 5, max: 15, premio: 5 },
-            lotomania:  { nome: 'Lotomania', total: 100, min: 20, max: 50, premio: 20 },
-            duplasena:  { nome: 'Dupla Sena', total: 50, min: 6, max: 15, premio: 6 },
-            timemania:  { nome: 'Timemania', total: 80, min: 10, max: 20, premio: 10 }
+            megasena:   { 
+                nome: 'Mega-Sena', total: 60, min: 6, max: 20, premio: 6,
+                cores: { main: '#1f8b5a', dark: '#146a44', light: '#2e7d5e', bg: '#0b2b1e', text: '#1e3b2a', pale: '#e6f0ea' }
+            },
+            lotofacil:  { 
+                nome: 'Lotofácil', total: 25, min: 15, max: 20, premio: 15,
+                cores: { main: '#b32882', dark: '#8a1e64', light: '#cc499f', bg: '#360c27', text: '#3b1a2d', pale: '#f5e4ef' }
+            },
+            quina:      { 
+                nome: 'Quina', total: 80, min: 5, max: 15, premio: 5,
+                cores: { main: '#3a358c', dark: '#292566', light: '#544ea6', bg: '#111029', text: '#1a1936', pale: '#e8e7f2' }
+            },
+            lotomania:  { 
+                nome: 'Lotomania', total: 100, min: 20, max: 50, premio: 20,
+                cores: { main: '#e67e22', dark: '#c0392b', light: '#f39c12', bg: '#3e2008', text: '#4a2c11', pale: '#fdf2e9' }
+            },
+            duplasena:  { 
+                nome: 'Dupla Sena', total: 50, min: 6, max: 15, premio: 6,
+                cores: { main: '#b8223f', dark: '#8f182f', light: '#d13b58', bg: '#3b0913', text: '#45131d', pale: '#f7e6e9' }
+            },
+            timemania:  { 
+                nome: 'Timemania', total: 80, min: 10, max: 20, premio: 10,
+                cores: { main: '#008f44', dark: '#006b33', light: '#15ab5b', bg: '#002913', text: '#0b361d', pale: '#e6f2eb' }
+            }
         };
 
         const elements = {
@@ -706,6 +742,17 @@
         // --- Lógica Principal ---
         const getConfig = () => LOTERIAS[state.loteria];
 
+        const aplicarTema = () => {
+            const cores = getConfig().cores;
+            const root = document.documentElement;
+            root.style.setProperty('--primary', cores.main);
+            root.style.setProperty('--primary-dark', cores.dark);
+            root.style.setProperty('--primary-light', cores.light);
+            root.style.setProperty('--bg-color', cores.bg);
+            root.style.setProperty('--text-main', cores.text);
+            root.style.setProperty('--primary-pale', cores.pale);
+        };
+
         const gerarDezenas = (qtd, total) => {
             let selected = [...state.fixed];
             if (selected.length > qtd) return null;
@@ -738,6 +785,8 @@
         // --- Renderização ---
         const atualizarInterface = () => {
             const cfg = getConfig();
+            aplicarTema();
+
             elements.qtd.min = cfg.min;
             elements.qtd.max = cfg.max;
             elements.qtd.value = Math.min(Math.max(elements.qtd.value || cfg.min, cfg.min), cfg.max);
@@ -851,4 +900,129 @@
                 const card = document.createElement('div');
                 card.className = 'game-card';
                 
-                const
+                const numStrFormatado = jogo.dezenas.map(n => n.toString().padStart(2, '0')).join(' - ');
+
+                let html = `<div class="numbers">`;
+                jogo.dezenas.forEach(n => {
+                    html += `<span>${n.toString().padStart(2, '0')}</span>`;
+                });
+                html += `</div>
+                         <button class="copy-btn" data-nums="${numStrFormatado}">📋 Copiar Jogo</button>
+                         <div class="stats">
+                             <span><strong>Pares:</strong> ${jogo.stats.pares}</span>
+                             <span><strong>Ímpares:</strong> ${jogo.stats.impares}</span>
+                             <span><strong>Soma:</strong> ${jogo.stats.soma}</span>
+                             <span><strong>Amplitude:</strong> ${jogo.stats.intervalo}</span>
+                         </div>
+                         <div class="prob">🎯 Chance de prêmio máximo: 1 em ${formatNum(jogo.prob)}</div>`;
+                
+                card.innerHTML = html;
+                elements.gameList.appendChild(card);
+            });
+
+            document.querySelectorAll('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => copyToClipboard(e.target.dataset.nums));
+            });
+        };
+
+        const renderHistory = () => {
+            elements.historyList.innerHTML = '';
+            if (!state.history.length) {
+                elements.historyList.innerHTML = '<span class="no-games">Nenhum jogo no histórico.</span>';
+                return;
+            }
+            
+            [...state.history].reverse().slice(0, 15).forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerHTML = `
+                    <span class="h-nums">${item.numbers.map(n => n.toString().padStart(2, '0')).join(' ')}</span>
+                    <span class="h-prob">${item.name}</span>
+                `;
+                elements.historyList.appendChild(div);
+            });
+        };
+
+        const simularEstatisticas = () => {
+            const cfg = getConfig();
+            const freq = new Array(cfg.total).fill(0);
+            
+            elements.btnStats.innerHTML = '⏳ Calculando...';
+            elements.btnStats.disabled = true;
+
+            setTimeout(() => {
+                // Simulação com leve viés aleatório para dados mais "reais"
+                for(let i=0; i<100; i++){
+                    let sorteio = new Set();
+                    while(sorteio.size < cfg.premio) {
+                        sorteio.add(Math.floor(Math.random() * cfg.total) + 1);
+                    }
+                    sorteio.forEach(num => freq[num - 1]++);
+                }
+
+                const dados = freq.map((count, i) => ({
+                    num: i + 1,
+                    count,
+                    perc: (count / (100 * cfg.premio)) * 100
+                })).sort((a, b) => b.count - a.count);
+
+                const max = dados[0].count;
+                const min = dados[dados.length-1].count;
+                
+                const topNums = dados.filter(d => d.count === max).map(d => d.num);
+                const botNums = dados.filter(d => d.count === min).map(d => d.num);
+
+                elements.statsSummary.innerHTML = `
+                    <span><strong>🔥 Quentes (${max}x):</strong> <span class="hot">${topNums.join(', ')}</span></span>
+                    <span><strong>❄️ Frios (${min}x):</strong> <span class="cold">${botNums.join(', ')}</span></span>
+                `;
+
+                const top5 = dados.slice(0, 5).map(d => d.num);
+                const bot5 = dados.slice(-5).map(d => d.num);
+
+                elements.statsBody.innerHTML = dados.map(d => {
+                    const isHot = top5.includes(d.num);
+                    const isCold = bot5.includes(d.num);
+                    const badge = isHot ? '<span class="badge hot-badge">Alta</span>' : (isCold ? '<span class="badge cold-badge">Baixa</span>' : '');
+                    const barW = Math.max(2, (d.count / max) * 100);
+
+                    return `
+                        <tr>
+                            <td><strong>${d.num.toString().padStart(2, '0')}</strong> ${badge}</td>
+                            <td>${d.count}</td>
+                            <td>${d.perc.toFixed(2)}%</td>
+                            <td style="width: 40%;"><div class="freq-bar" style="width: ${barW}%"></div></td>
+                        </tr>
+                    `;
+                }).join('');
+
+                elements.btnStats.innerHTML = '🔄 Refazer Simulação';
+                elements.btnStats.disabled = false;
+                showToast('Análise de 100 concursos concluída!');
+            }, 600);
+        };
+
+        // --- Eventos ---
+        elements.select.addEventListener('change', (e) => {
+            state.loteria = e.target.value;
+            state.fixed = [];
+            atualizarInterface();
+        });
+
+        elements.btnAdd.addEventListener('click', adicionarFixas);
+        elements.fixasInput.addEventListener('keypress', e => { if (e.key === 'Enter') adicionarFixas(); });
+        elements.btnGerar.addEventListener('click', gerarJogos);
+        elements.btnStats.addEventListener('click', simularEstatisticas);
+        
+        elements.btnClearHistory.addEventListener('click', () => {
+            state.history = [];
+            renderHistory();
+            showToast('Histórico limpo.');
+        });
+
+        // Start
+        atualizarInterface();
+    })();
+</script>
+</body>
+</html>
