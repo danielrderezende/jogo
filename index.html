@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Loteria Inteligente + Estatísticas</title>
     <style>
+        :root {
+            --primary: #1f8b5a;
+            --primary-dark: #146a44;
+            --primary-light: #2e7d5e;
+            --bg-color: #0b2b1e;
+            --text-main: #1e3b2a;
+            --text-muted: #5a7a68;
+            --danger: #e74c3c;
+            --info: #3498db;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -13,85 +24,95 @@
 
         body {
             font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-            background: linear-gradient(145deg, #0b2b1e 0%, #1a4a33 100%);
+            background: linear-gradient(145deg, var(--bg-color) 0%, #1a4a33 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            color: var(--text-main);
         }
 
         .container {
             max-width: 860px;
             width: 100%;
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(4px);
-            border-radius: 32px;
-            padding: 30px 28px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         h1 {
             font-size: 2rem;
-            font-weight: 700;
-            color: #1e3b2a;
+            font-weight: 800;
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
+        
         h1 small {
             font-size: 1rem;
-            font-weight: 400;
-            color: #3b6b4f;
+            font-weight: 500;
+            color: var(--primary-light);
             margin-left: auto;
+            background: #e6f0ea;
+            padding: 4px 12px;
+            border-radius: 20px;
         }
 
         .subtitle {
-            color: #2d5a3e;
-            margin-bottom: 22px;
-            border-left: 4px solid #2e7d5e;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            border-left: 4px solid var(--primary-light);
             padding-left: 14px;
-            font-weight: 300;
+            font-weight: 400;
         }
 
         /* Formulário */
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 18px 20px;
-            margin-bottom: 20px;
+            gap: 20px;
+            margin-bottom: 24px;
         }
 
         .field {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
         }
 
         .field label {
             font-weight: 600;
             font-size: 0.9rem;
-            color: #1f402b;
             letter-spacing: 0.3px;
         }
 
         .field select,
         .field input {
-            padding: 10px 14px;
-            border: 2px solid #c0d6c8;
-            border-radius: 14px;
+            padding: 12px 14px;
+            border: 2px solid #d0e0d6;
+            border-radius: 12px;
             font-size: 1rem;
-            background: white;
-            transition: 0.2s;
+            background: #f9fbf9;
+            transition: all 0.2s;
             outline: none;
             width: 100%;
         }
 
         .field select:focus,
         .field input:focus {
-            border-color: #1f8b5a;
-            box-shadow: 0 0 0 4px rgba(31, 139, 90, 0.2);
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(31, 139, 90, 0.15);
         }
 
         .field input[type="number"] {
@@ -105,14 +126,13 @@
 
         .field .helper {
             font-size: 0.75rem;
-            color: #4a6b56;
-            margin-top: 2px;
+            color: var(--text-muted);
         }
 
         .field .error-msg {
-            color: #c0392b;
+            color: var(--danger);
             font-size: 0.8rem;
-            font-weight: 500;
+            font-weight: 600;
             min-height: 1.2em;
         }
 
@@ -121,405 +141,399 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
+            background: #f4f8f5;
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px dashed #bdd3c5;
         }
-        .fixas-area label {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #1f402b;
-        }
+
         .fixas-area .fixas-input-wrapper {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             gap: 10px;
         }
+
         .fixas-area input {
             flex: 1;
             min-width: 180px;
-            padding: 10px 14px;
-            border: 2px solid #c0d6c8;
-            border-radius: 14px;
-            font-size: 0.95rem;
-            background: white;
-            transition: 0.2s;
+            padding: 12px 14px;
+            border: 2px solid #d0e0d6;
+            border-radius: 12px;
+            font-size: 1rem;
             outline: none;
         }
+
         .fixas-area input:focus {
-            border-color: #1f8b5a;
-            box-shadow: 0 0 0 4px rgba(31, 139, 90, 0.2);
+            border-color: var(--primary);
         }
-        .fixas-area .fixas-tags {
+
+        .btn-add {
+            background: var(--primary-light);
+            border: none;
+            color: white;
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-add:hover {
+            background: var(--primary-dark);
+        }
+
+        .fixas-tags {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 4px;
+            gap: 8px;
+            margin-top: 8px;
         }
-        .fixas-tags .tag {
-            background: #e6f0ea;
-            border-radius: 30px;
-            padding: 4px 14px 4px 16px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #1f402b;
+
+        .tag {
+            background: white;
+            border: 1px solid #bdd3c5;
+            border-radius: 20px;
+            padding: 4px 12px 4px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
-        .fixas-tags .tag .remove-tag {
+
+        .remove-tag {
             cursor: pointer;
-            font-weight: 700;
-            color: #a93226;
-            font-size: 1rem;
-            line-height: 1;
+            color: var(--danger);
+            font-weight: bold;
             background: none;
             border: none;
-            padding: 0 2px;
-        }
-        .fixas-tags .tag .remove-tag:hover {
-            color: #e74c3c;
+            font-size: 1.1rem;
         }
 
         .btn-generate {
             width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #1f8b5a, #146a44);
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border: none;
-            border-radius: 50px;
+            border-radius: 16px;
             color: white;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 700;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             cursor: pointer;
-            transition: 0.25s;
-            box-shadow: 0 8px 18px rgba(26, 74, 51, 0.4);
-            margin-top: 6px;
+            transition: all 0.2s;
+            box-shadow: 0 8px 20px rgba(26, 74, 51, 0.3);
         }
+
         .btn-generate:hover {
-            transform: scale(1.01);
-            background: linear-gradient(135deg, #239f68, #167a4e);
-            box-shadow: 0 10px 24px rgba(26, 74, 51, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(26, 74, 51, 0.4);
         }
+        
         .btn-generate:active {
-            transform: scale(0.97);
+            transform: translateY(1px);
         }
 
         /* Resultado dos jogos */
         .result-area {
-            margin-top: 28px;
-            padding-top: 20px;
-            border-top: 2px dashed #bdd3c5;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 2px solid #eef4f0;
         }
 
         .game-list {
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 20px;
         }
 
         .game-card {
-            background: #f6fbf8;
-            border-radius: 20px;
-            padding: 16px 20px 14px;
-            box-shadow: inset 0 1px 4px rgba(0,0,0,0.02), 0 4px 12px rgba(0, 20, 10, 0.08);
-            border-left: 6px solid #2e7d5e;
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #eef4f0;
+            border-left: 6px solid var(--primary);
+            position: relative;
+            animation: fadeIn 0.4s ease-out;
         }
 
+        /* Novas Bolas de Loteria */
         .game-card .numbers {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px 12px;
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #1a3d29;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
+            gap: 10px;
+            margin-bottom: 12px;
         }
+
         .game-card .numbers span {
-            background: white;
-            padding: 2px 12px;
-            border-radius: 30px;
-            box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+            background: radial-gradient(circle at 30% 30%, #ffffff, #e6f0ea);
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            box-shadow: inset -2px -2px 6px rgba(0,0,0,0.1), 0 3px 6px rgba(0,0,0,0.1);
+            border: 1px solid #d0e0d6;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #eef4f0;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .copy-btn:hover {
+            background: #dceada;
         }
 
         .game-card .stats {
             display: flex;
             flex-wrap: wrap;
             gap: 10px 20px;
-            font-size: 0.9rem;
-            color: #2d5a3e;
-            background: #edf5f0;
-            padding: 8px 14px;
-            border-radius: 40px;
-            margin-top: 4px;
-        }
-        .game-card .stats strong {
-            font-weight: 600;
-            color: #14462b;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: #f9fbf9;
+            padding: 10px 16px;
+            border-radius: 12px;
         }
 
         .game-card .prob {
-            margin-top: 8px;
-            font-size: 0.95rem;
-            background: #e2eee7;
-            padding: 6px 16px;
-            border-radius: 40px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            background: #e6f0ea;
+            padding: 8px 16px;
+            border-radius: 8px;
             display: inline-block;
-            color: #003d1f;
-            font-weight: 500;
+            font-weight: 600;
+            color: var(--primary-dark);
         }
 
         .no-games {
             text-align: center;
-            color: #5a7a68;
-            padding: 30px 10px;
+            color: var(--text-muted);
+            padding: 20px;
             font-style: italic;
         }
 
-        /* Histórico de jogos */
+        /* Histórico */
         .history-area {
             margin-top: 24px;
-            padding-top: 16px;
-            border-top: 1px solid #d0e0d6;
+            background: #f9fbf9;
+            padding: 16px;
+            border-radius: 16px;
         }
+        
         .history-area summary {
             cursor: pointer;
-            font-weight: 600;
-            color: #1f402b;
-            font-size: 0.95rem;
-            padding: 6px 0;
+            font-weight: 700;
+            color: var(--text-main);
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .history-area summary:hover {
-            color: #146a44;
-        }
+        
         .history-list {
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            margin-top: 12px;
-            max-height: 200px;
+            gap: 8px;
+            margin-top: 16px;
+            max-height: 250px;
             overflow-y: auto;
-            padding-right: 6px;
         }
+        
         .history-item {
-            background: #f0f7f3;
-            border-radius: 30px;
-            padding: 6px 16px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #1a3d29;
+            background: white;
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-size: 0.9rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-left: 3px solid #5b8f74;
+            border: 1px solid #eef4f0;
+            border-left: 4px solid #a8c9b6;
         }
-        .history-item .h-nums {
-            font-weight: 600;
-        }
-        .history-item .h-prob {
-            color: #2e6b4a;
-            font-weight: 400;
-            font-size: 0.75rem;
-        }
+
+        .history-item .h-nums { font-weight: 700; letter-spacing: 1px; }
+        .history-item .h-prob { color: var(--text-muted); font-size: 0.8rem; }
+        
         .history-clear {
             background: none;
             border: none;
-            color: #a93226;
-            font-size: 0.8rem;
+            color: var(--danger);
+            font-size: 0.85rem;
+            font-weight: 600;
             cursor: pointer;
-            text-decoration: underline;
-            padding: 6px 0;
-            align-self: flex-end;
-        }
-        .history-clear:hover {
-            color: #e74c3c;
+            margin-top: 12px;
+            display: inline-block;
         }
 
-        /* ----- NOVA SEÇÃO: PESQUISA HISTÓRICA (tabela de frequência) ----- */
+        /* Estatísticas */
         .stats-area {
-            margin-top: 28px;
-            padding-top: 20px;
-            border-top: 2px dashed #bdd3c5;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 2px solid #eef4f0;
         }
 
-        .stats-area .stats-header {
+        .stats-header {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 16px;
+            margin-bottom: 20px;
         }
 
-        .stats-area .stats-header h3 {
-            font-size: 1.2rem;
-            color: #1e3b2a;
+        .btn-stats {
+            background: var(--text-main);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .stats-area .stats-header .btn-stats {
-            background: #2e7d5e;
-            border: none;
-            color: white;
-            padding: 8px 20px;
-            border-radius: 30px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 0.9rem;
-        }
-        .stats-area .stats-header .btn-stats:hover {
-            background: #1f6b4a;
-            transform: scale(1.02);
-        }
+        .btn-stats:hover { background: #2c523b; }
 
         .stats-summary {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px 24px;
-            background: #edf5f0;
-            padding: 10px 18px;
-            border-radius: 40px;
-            margin-bottom: 16px;
-            font-size: 0.9rem;
-            color: #1f402b;
-        }
-        .stats-summary strong {
-            color: #14462b;
-        }
-        .stats-summary .hot {
-            color: #c0392b;
-            font-weight: 700;
-        }
-        .stats-summary .cold {
-            color: #2980b9;
-            font-weight: 700;
+            gap: 16px;
+            background: #f4f8f5;
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
         }
 
+        .hot { color: var(--danger); font-weight: 800; }
+        .cold { color: var(--info); font-weight: 800; }
+
         .table-wrapper {
-            max-height: 350px;
+            max-height: 400px;
             overflow-y: auto;
             border-radius: 16px;
             border: 1px solid #d0e0d6;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
         }
 
-        .table-wrapper table {
+        table {
             width: 100%;
             border-collapse: collapse;
             background: white;
-            font-size: 0.9rem;
+            text-align: left;
         }
 
-        .table-wrapper th {
+        th {
             background: #e6f0ea;
-            color: #1a3d29;
-            font-weight: 600;
-            padding: 10px 12px;
-            text-align: left;
+            color: var(--text-main);
+            font-weight: 700;
+            padding: 14px 16px;
             position: sticky;
             top: 0;
             z-index: 2;
-            border-bottom: 2px solid #bdd3c5;
         }
 
-        .table-wrapper td {
-            padding: 8px 12px;
-            border-bottom: 1px solid #eaf3ed;
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f4f2;
+            font-size: 0.95rem;
         }
 
-        .table-wrapper tr:hover td {
-            background: #f6fbf8;
-        }
+        tr:hover td { background: #f9fbf9; }
 
-        .table-wrapper .freq-bar {
+        .freq-bar {
             display: inline-block;
-            height: 8px;
+            height: 10px;
             border-radius: 10px;
-            background: #2e7d5e;
-            margin-right: 8px;
+            background: linear-gradient(90deg, var(--primary-light), var(--primary));
             min-width: 4px;
+            transition: width 1s ease-out;
         }
 
-        .table-wrapper .num-hot {
-            background: #fde8e8;
-            font-weight: 600;
-        }
-        .table-wrapper .num-cold {
-            background: #e8f0fa;
-            font-weight: 600;
-        }
-
-        .table-wrapper .badge {
+        .badge {
             display: inline-block;
-            background: #f39c12;
             color: white;
-            border-radius: 20px;
-            padding: 0 10px;
-            font-size: 0.7rem;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 0.75rem;
             font-weight: 700;
-            margin-left: 6px;
+            margin-left: 8px;
+        }
+        .hot-badge { background: var(--danger); }
+        .cold-badge { background: var(--info); }
+
+        /* Toast Notificações */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 9999;
         }
 
-        .table-wrapper .badge.hot-badge {
-            background: #e74c3c;
-        }
-        .table-wrapper .badge.cold-badge {
-            background: #3498db;
+        .toast {
+            background: #333;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease-out forwards, fadeOut 0.3s ease-in 2.7s forwards;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        /* Responsivo */
+        .toast.success { background: var(--primary); }
+        .toast.error { background: var(--danger); }
+
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0;} to { transform: translateX(0); opacity: 1;} }
+        @keyframes fadeOut { from { transform: translateX(0); opacity: 1;} to { transform: translateX(100%); opacity: 0;} }
+
+        /* Responsividade */
         @media (max-width: 600px) {
-            .container {
-                padding: 20px 16px;
-            }
-            .form-grid {
-                grid-template-columns: 1fr;
-                gap: 14px;
-            }
-            .fixas-area {
-                grid-column: 1;
-            }
-            h1 {
-                font-size: 1.6rem;
-                flex-wrap: wrap;
-            }
-            h1 small {
-                font-size: 0.85rem;
-                margin-left: 0;
-            }
-            .game-card .numbers {
-                font-size: 1.1rem;
-                gap: 6px 8px;
-            }
-            .btn-generate {
-                font-size: 1.1rem;
-                padding: 14px;
-            }
-            .stats-area .stats-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .stats-summary {
-                flex-direction: column;
-                gap: 6px;
-            }
+            .container { padding: 20px; }
+            .form-grid { grid-template-columns: 1fr; gap: 16px; }
+            h1 { font-size: 1.5rem; flex-wrap: wrap; }
+            h1 small { margin-left: 0; width: 100%; text-align: center; margin-top: 8px; }
+            .game-card .numbers span { width: 36px; height: 36px; font-size: 1rem; }
+            .copy-btn { position: relative; top: 0; right: 0; width: 100%; justify-content: center; margin-top: 12px; }
+            .stats-header { flex-direction: column; align-items: stretch; }
         }
 
-        .history-list::-webkit-scrollbar,
-        .table-wrapper::-webkit-scrollbar {
-            width: 5px;
-        }
-        .history-list::-webkit-scrollbar-track,
-        .table-wrapper::-webkit-scrollbar-track {
-            background: #dbe8e0;
-            border-radius: 10px;
-        }
-        .history-list::-webkit-scrollbar-thumb,
-        .table-wrapper::-webkit-scrollbar-thumb {
-            background: #2e7d5e;
-            border-radius: 10px;
-        }
+        /* Scrollbars customizadas */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f0f4f2; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #a8c9b6; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary-light); }
     </style>
 </head>
 <body>
@@ -529,14 +543,11 @@
         🎯 Loteria
         <small>Inteligente + Estatísticas</small>
     </h1>
-    <div class="subtitle">
-        Gere jogos e consulte a frequência histórica dos números
-    </div>
+    <div class="subtitle">Gere jogos otimizados e consulte tendências matemáticas.</div>
 
-    <!-- FORMULÁRIO -->
     <div class="form-grid">
         <div class="field">
-            <label for="loteriaSelect">Loteria</label>
+            <label for="loteriaSelect">Modalidade</label>
             <select id="loteriaSelect">
                 <option value="megasena">Mega-Sena (60/6)</option>
                 <option value="lotofacil">Lotofácil (25/15)</option>
@@ -545,88 +556,88 @@
                 <option value="duplasena">Dupla Sena (50/6)</option>
                 <option value="timemania">Timemania (80/10)</option>
             </select>
-            <div class="helper" id="loteriaHelper">Selecione a modalidade</div>
+            <div class="helper" id="loteriaHelper">Selecione a loteria</div>
         </div>
 
         <div class="field">
-            <label for="qtd">Quantidade de dezenas</label>
+            <label for="qtd">Dezenas por jogo</label>
             <input type="number" id="qtd" min="6" max="20" value="6" />
             <div class="helper" id="qtdHelper">Mínimo 6, máximo 20</div>
             <div class="error-msg" id="qtdError"></div>
         </div>
 
-        <div class="field">
-            <label for="qtdJogos">Número de jogos</label>
+        <div class="field" style="grid-column: 1 / -1;">
+            <label for="qtdJogos">Quantidade de bilhetes (jogos)</label>
             <input type="number" id="qtdJogos" min="1" max="10" value="1" />
-            <div class="helper">1 a 10 jogos por vez</div>
+            <div class="helper">Gere de 1 a 10 jogos simultaneamente</div>
             <div class="error-msg" id="jogosError"></div>
         </div>
 
         <div class="fixas-area">
-            <label>Dezenas fixas (opcional)</label>
+            <label>Dezenas fixas (Garantidas no sorteio)</label>
             <div class="fixas-input-wrapper">
                 <input type="text" id="fixasInput" placeholder="Ex: 5, 23, 41" />
-                <button type="button" id="addFixasBtn" style="background:#2e7d5e;border:none;color:white;border-radius:30px;padding:8px 18px;font-weight:600;cursor:pointer;transition:0.2s;">Adicionar</button>
+                <button type="button" id="addFixasBtn" class="btn-add">Adicionar</button>
             </div>
             <div class="fixas-tags" id="fixasTags"></div>
             <div class="error-msg" id="fixasError"></div>
         </div>
     </div>
 
-    <button class="btn-generate" id="gerarBtn">🚀 Gerar Jogo(s)</button>
+    <button class="btn-generate" id="gerarBtn">🚀 Gerar Palpites</button>
 
-    <!-- RESULTADO DOS JOGOS -->
     <div class="result-area" id="resultArea">
         <div class="game-list" id="gameList">
-            <div class="no-games">Nenhum jogo gerado ainda.</div>
+            <div class="no-games">Aguardando geração de jogos...</div>
         </div>
     </div>
 
-    <!-- HISTÓRICO DE JOGOS GERADOS -->
     <div class="history-area">
         <details>
-            <summary>📋 Histórico de jogos</summary>
+            <summary>📋 Histórico de Palpites Gerados</summary>
             <div class="history-list" id="historyList">
-                <span style="color:#5a7a68;font-size:0.9rem;">Nenhum jogo no histórico.</span>
+                <span class="no-games">Nenhum jogo no histórico.</span>
             </div>
-            <button class="history-clear" id="clearHistoryBtn">Limpar histórico</button>
+            <button class="history-clear" id="clearHistoryBtn">Limpar Histórico</button>
         </details>
     </div>
 
-    <!-- NOVA SEÇÃO: PESQUISA HISTÓRICA (TABELA DE FREQUÊNCIA) -->
     <div class="stats-area" id="statsArea">
         <div class="stats-header">
-            <h3>📊 Frequência dos números sorteados</h3>
-            <button class="btn-stats" id="carregarStatsBtn">🔍 Carregar histórico (100 concursos)</button>
+            <h3>📊 Mapa de Frequência (Simulação)</h3>
+            <button class="btn-stats" id="carregarStatsBtn">
+                <span>🔄 Analisar 100 Concursos</span>
+            </button>
         </div>
 
         <div class="stats-summary" id="statsSummary">
-            <span>Nenhum dado carregado.</span>
+            <span>Aguardando análise de dados...</span>
         </div>
 
         <div class="table-wrapper" id="statsTableWrapper">
             <table id="statsTable">
                 <thead>
                     <tr>
-                        <th>Número</th>
-                        <th>Frequência</th>
-                        <th>Percentual</th>
-                        <th>Destaque</th>
+                        <th>Nº</th>
+                        <th>Aparições</th>
+                        <th>Prob. (%)</th>
+                        <th>Gráfico</th>
                     </tr>
                 </thead>
                 <tbody id="statsBody">
-                    <tr><td colspan="4" style="text-align:center;color:#5a7a68;padding:20px;">Clique em "Carregar histórico" para ver a estatística.</td></tr>
+                    <tr><td colspan="4" class="no-games">Clique no botão acima para rodar a simulação estatística.</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
+<div id="toast-container"></div>
+
 <script>
     (function() {
         "use strict";
 
-        // ----- CONFIGURAÇÕES DAS LOTERIAS -----
         const LOTERIAS = {
             megasena:   { nome: 'Mega-Sena', total: 60, min: 6, max: 20, premio: 6 },
             lotofacil:  { nome: 'Lotofácil', total: 25, min: 15, max: 20, premio: 15 },
@@ -636,466 +647,208 @@
             timemania:  { nome: 'Timemania', total: 80, min: 10, max: 20, premio: 10 }
         };
 
-        // ----- DOM refs -----
-        const loteriaSelect = document.getElementById('loteriaSelect');
-        const qtdInput = document.getElementById('qtd');
-        const qtdJogosInput = document.getElementById('qtdJogos');
-        const fixasInput = document.getElementById('fixasInput');
-        const addFixasBtn = document.getElementById('addFixasBtn');
-        const fixasTags = document.getElementById('fixasTags');
-        const fixasError = document.getElementById('fixasError');
-        const qtdError = document.getElementById('qtdError');
-        const jogosError = document.getElementById('jogosError');
-        const qtdHelper = document.getElementById('qtdHelper');
-        const loteriaHelper = document.getElementById('loteriaHelper');
-        const gerarBtn = document.getElementById('gerarBtn');
-        const gameList = document.getElementById('gameList');
-        const historyList = document.getElementById('historyList');
-        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
-        const carregarStatsBtn = document.getElementById('carregarStatsBtn');
-        const statsBody = document.getElementById('statsBody');
-        const statsSummary = document.getElementById('statsSummary');
+        const elements = {
+            select: document.getElementById('loteriaSelect'),
+            qtd: document.getElementById('qtd'),
+            jogos: document.getElementById('qtdJogos'),
+            fixasInput: document.getElementById('fixasInput'),
+            btnAdd: document.getElementById('addFixasBtn'),
+            tags: document.getElementById('fixasTags'),
+            btnGerar: document.getElementById('gerarBtn'),
+            gameList: document.getElementById('gameList'),
+            historyList: document.getElementById('historyList'),
+            btnClearHistory: document.getElementById('clearHistoryBtn'),
+            btnStats: document.getElementById('carregarStatsBtn'),
+            statsBody: document.getElementById('statsBody'),
+            statsSummary: document.getElementById('statsSummary'),
+            toastContainer: document.getElementById('toast-container')
+        };
 
-        // ----- Estado -----
-        let fixedNumbers = [];
-        let history = [];
-        let currentLoteria = 'megasena';
-        let historicoSimulado = null; // guarda os sorteios gerados
+        const errors = {
+            qtd: document.getElementById('qtdError'),
+            jogos: document.getElementById('jogosError'),
+            fixas: document.getElementById('fixasError')
+        };
 
-        // ----- Utilitários -----
-        function combinacao(n, r) {
+        let state = {
+            fixed: [],
+            history: [],
+            loteria: 'megasena'
+        };
+
+        // --- Utils ---
+        const showToast = (msg, type = 'success') => {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = type === 'success' ? `✅ ${msg}` : `⚠️ ${msg}`;
+            elements.toastContainer.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        };
+
+        const copyToClipboard = async (text) => {
+            try {
+                await navigator.clipboard.writeText(text);
+                showToast('Números copiados com sucesso!');
+            } catch (err) {
+                showToast('Erro ao copiar números.', 'error');
+            }
+        };
+
+        const combinacao = (n, r) => {
             if (r < 0 || r > n) return 0;
             let res = 1;
-            for (let i = 1; i <= r; i++) {
-                res = res * (n - r + i) / i;
-            }
+            for (let i = 1; i <= r; i++) res = res * (n - r + i) / i;
             return Math.round(res);
-        }
+        };
 
-        function getConfig() {
-            return LOTERIAS[currentLoteria];
-        }
+        const formatNum = num => Math.round(num).toLocaleString('pt-BR');
 
-        function gerarDezenas(qtd, total) {
-            if (qtd < 1) return null;
-            const fixos = fixedNumbers.slice();
-            if (fixos.length > qtd) return null;
-            let selected = fixos.slice();
+        // --- Lógica Principal ---
+        const getConfig = () => LOTERIAS[state.loteria];
+
+        const gerarDezenas = (qtd, total) => {
+            let selected = [...state.fixed];
+            if (selected.length > qtd) return null;
+            
             while (selected.length < qtd) {
                 const n = Math.floor(Math.random() * total) + 1;
                 if (!selected.includes(n)) selected.push(n);
             }
-            selected.sort((a, b) => a - b);
-            return selected;
-        }
+            return selected.sort((a, b) => a - b);
+        };
 
-        function calcularProbabilidade(qtd, config) {
+        const calcularProbabilidade = (qtd, config) => {
             const { total, premio } = config;
             if (qtd < premio) return Infinity;
-            const totalComb = combinacao(total, premio);
-            const escolhaComb = combinacao(qtd, premio);
-            if (escolhaComb === 0) return Infinity;
-            return totalComb / escolhaComb;
-        }
+            const tComb = combinacao(total, premio);
+            const eComb = combinacao(qtd, premio);
+            return eComb === 0 ? Infinity : tComb / eComb;
+        };
 
-        function obterStats(dezenas) {
+        const obterStats = dezenas => {
             const pares = dezenas.filter(d => d % 2 === 0).length;
-            const impares = dezenas.length - pares;
-            const soma = dezenas.reduce((acc, v) => acc + v, 0);
-            const intervalo = dezenas[dezenas.length - 1] - dezenas[0];
-            return { pares, impares, soma, intervalo };
-        }
+            return {
+                pares,
+                impares: dezenas.length - pares,
+                soma: dezenas.reduce((a, b) => a + b, 0),
+                intervalo: dezenas[dezenas.length - 1] - dezenas[0]
+            };
+        };
 
-        function formatNum(num) {
-            return Math.round(num).toLocaleString('pt-BR');
-        }
+        // --- Renderização ---
+        const atualizarInterface = () => {
+            const cfg = getConfig();
+            elements.qtd.min = cfg.min;
+            elements.qtd.max = cfg.max;
+            elements.qtd.value = Math.min(Math.max(elements.qtd.value || cfg.min, cfg.min), cfg.max);
+            
+            document.getElementById('qtdHelper').textContent = `Mínimo ${cfg.min}, máximo ${cfg.max}`;
+            document.getElementById('loteriaHelper').textContent = `Total: ${cfg.total} bolas | Acertos para prêmio: ${cfg.premio}`;
+            elements.fixasInput.placeholder = `Valores de 1 a ${cfg.total}`;
+            
+            elements.statsBody.innerHTML = `<tr><td colspan="4" class="no-games">Clique no botão acima para rodar a simulação.</td></tr>`;
+            elements.statsSummary.innerHTML = `<span>Aguardando análise de dados...</span>`;
+            
+            renderFixas();
+        };
 
-        // ----- Geração de histórico simulado com viés -----
-        function gerarHistoricoSimulado(total, qtdSorteio, numConcursos = 100) {
-            // Cria um viés: alguns números têm mais probabilidade de sair
-            const pesos = new Array(total).fill(1);
-            // Aumenta o peso de alguns números aleatórios (simula "quentes")
-            const numQuentes = Math.floor(total * 0.15);
-            const indices = [];
-            while (indices.length < numQuentes) {
-                const idx = Math.floor(Math.random() * total);
-                if (!indices.includes(idx)) indices.push(idx);
-            }
-            indices.forEach(idx => {
-                pesos[idx] = 2 + Math.random() * 2; // peso entre 2 e 4
-            });
-
-            // Sorteia os concursos
-            const sorteios = [];
-            for (let c = 0; c < numConcursos; c++) {
-                const dezenas = [];
-                while (dezenas.length < qtdSorteio) {
-                    // Sorteia com base nos pesos
-                    let r = Math.random() * pesos.reduce((a, b) => a + b, 0);
-                    let acum = 0;
-                    let chosen = 0;
-                    for (let i = 0; i < pesos.length; i++) {
-                        acum += pesos[i];
-                        if (r <= acum) {
-                            chosen = i + 1;
-                            break;
-                        }
-                    }
-                    if (!dezenas.includes(chosen)) dezenas.push(chosen);
-                }
-                dezenas.sort((a, b) => a - b);
-                sorteios.push(dezenas);
-            }
-            return sorteios;
-        }
-
-        // ----- Carregar e exibir estatísticas -----
-        function carregarEstatisticas() {
-            const config = getConfig();
-            const total = config.total;
-            const qtdSorteio = config.premio; // número de dezenas sorteadas por concurso
-            const numConcursos = 100;
-
-            // Gera histórico
-            historicoSimulado = gerarHistoricoSimulado(total, qtdSorteio, numConcursos);
-
-            // Calcula frequência
-            const freq = new Array(total).fill(0);
-            historicoSimulado.forEach(sorteio => {
-                sorteio.forEach(num => {
-                    freq[num - 1]++;
-                });
-            });
-
-            // Monta dados para tabela
-            const dados = freq.map((count, idx) => ({
-                numero: idx + 1,
-                frequencia: count,
-                percentual: (count / (numConcursos * qtdSorteio) * 100)
-            }));
-
-            // Ordena por frequência decrescente
-            dados.sort((a, b) => b.frequencia - a.frequencia);
-
-            // Resumo
-            const maxFreq = Math.max(...dados.map(d => d.frequencia));
-            const minFreq = Math.min(...dados.map(d => d.frequencia));
-            const maisQuente = dados.filter(d => d.frequencia === maxFreq).map(d => d.numero);
-            const maisFrio = dados.filter(d => d.frequencia === minFreq).map(d => d.numero);
-
-            statsSummary.innerHTML = `
-                <span><strong>Total de concursos:</strong> ${numConcursos}</span>
-                <span><strong>Números mais quentes (${maxFreq}x):</strong> <span class="hot">${maisQuente.join(', ')}</span></span>
-                <span><strong>Números mais frios (${minFreq}x):</strong> <span class="cold">${maisFrio.join(', ')}</span></span>
-            `;
-
-            // Renderiza tabela
-            const top5 = dados.slice(0, 5).map(d => d.numero);
-            const bottom5 = dados.slice(-5).map(d => d.numero);
-
-            let html = '';
-            dados.forEach(d => {
-                const isHot = top5.includes(d.numero);
-                const isCold = bottom5.includes(d.numero);
-                let cls = '';
-                let badge = '';
-                if (isHot) {
-                    cls = 'num-hot';
-                    badge = '<span class="badge hot-badge">🔥</span>';
-                } else if (isCold) {
-                    cls = 'num-cold';
-                    badge = '<span class="badge cold-badge">❄️</span>';
-                }
-                // Barra de frequência (escala até 20% do total)
-                const barWidth = Math.max(4, (d.frequencia / (numConcursos * qtdSorteio)) * 200);
-                html += `
-                    <tr class="${cls}">
-                        <td><strong>${d.numero}</strong> ${badge}</td>
-                        <td>${d.frequencia}</td>
-                        <td>${d.percentual.toFixed(2)}%</td>
-                        <td><span class="freq-bar" style="width:${barWidth}px;"></span></td>
-                    </tr>
-                `;
-            });
-
-            statsBody.innerHTML = html;
-        }
-
-        // ----- Atualização da interface por loteria -----
-        function atualizarPorLoteria() {
-            const config = getConfig();
-            const { min, max, total, nome, premio } = config;
-
-            qtdInput.min = min;
-            qtdInput.max = max;
-            qtdInput.value = Math.min(Math.max(parseInt(qtdInput.value, 10) || min, min), max);
-            qtdHelper.textContent = `Mínimo ${min}, máximo ${max}`;
-            loteriaHelper.textContent = `${nome} – total: ${total}, prêmio: ${premio} acertos`;
-            fixasInput.placeholder = `Números entre 1 e ${total}`;
-
-            qtdError.textContent = '';
-            fixasError.textContent = '';
-            validarFixas();
-
-            // Limpa estatísticas ao trocar de loteria (dados diferentes)
-            historicoSimulado = null;
-            statsBody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#5a7a68;padding:20px;">Clique em "Carregar histórico" para ver a estatística.</td></tr>`;
-            statsSummary.innerHTML = `<span>Nenhum dado carregado.</span>`;
-
-            // Limpa resultados de jogos (opcional)
-            gameList.innerHTML = '<div class="no-games">Nenhum jogo gerado ainda.</div>';
-        }
-
-        // ----- Validação de fixas -----
-        function validarFixas() {
-            const config = getConfig();
-            const qtd = parseInt(qtdInput.value, 10) || config.min;
-            fixasError.textContent = '';
-            if (fixedNumbers.length > qtd) {
-                fixasError.textContent = `Fixas (${fixedNumbers.length}) > total (${qtd}).`;
-                return false;
-            }
-            const unique = new Set(fixedNumbers);
-            if (unique.size !== fixedNumbers.length) {
-                fixasError.textContent = 'Dezenas fixas duplicadas.';
-                return false;
-            }
-            const invalidos = fixedNumbers.filter(n => n < 1 || n > config.total);
-            if (invalidos.length > 0) {
-                fixasError.textContent = `Dezenas devem estar entre 1 e ${config.total}.`;
-                return false;
-            }
-            return true;
-        }
-
-        function validarCampos() {
-            const config = getConfig();
-            let ok = true;
-            const qtd = parseInt(qtdInput.value, 10);
-            const jogos = parseInt(qtdJogosInput.value, 10);
-
-            qtdError.textContent = '';
-            jogosError.textContent = '';
-
-            if (isNaN(qtd) || qtd < config.min || qtd > config.max) {
-                qtdError.textContent = `Digite um número entre ${config.min} e ${config.max}.`;
-                ok = false;
-            }
-            if (isNaN(jogos) || jogos < 1 || jogos > 10) {
-                jogosError.textContent = 'Digite um número entre 1 e 10.';
-                ok = false;
-            }
-            if (!validarFixas()) ok = false;
-            return ok;
-        }
-
-        // ----- Adicionar fixas -----
-        function adicionarFixas() {
-            const config = getConfig();
-            const raw = fixasInput.value.trim();
-            if (!raw) {
-                fixasError.textContent = 'Digite ao menos um número.';
+        const renderFixas = () => {
+            elements.tags.innerHTML = '';
+            if (!state.fixed.length) {
+                elements.tags.innerHTML = '<span class="no-games" style="padding:0; font-size:0.85rem">Nenhuma fixa adicionada</span>';
                 return;
             }
-            const parts = raw.split(/[\s,]+/).filter(p => p !== '');
-            const nums = parts.map(p => parseInt(p, 10)).filter(n => !isNaN(n) && n >= 1 && n <= config.total);
-
-            if (nums.length === 0) {
-                fixasError.textContent = `Números inválidos. Use valores entre 1 e ${config.total}.`;
-                return;
-            }
-
-            let added = 0;
-            nums.forEach(n => {
-                if (!fixedNumbers.includes(n)) {
-                    fixedNumbers.push(n);
-                    added++;
-                }
-            });
-
-            if (added === 0) {
-                fixasError.textContent = 'Todos os números já estão na lista.';
-            } else {
-                fixedNumbers.sort((a, b) => a - b);
-                fixasError.textContent = '';
-                fixasInput.value = '';
-                renderFixas();
-                validarFixas();
-            }
-        }
-
-        function renderFixas() {
-            fixasTags.innerHTML = '';
-            if (fixedNumbers.length === 0) {
-                fixasTags.innerHTML = '<span style="color:#5a7a68;font-size:0.8rem;">Nenhuma dezena fixa</span>';
-                return;
-            }
-            fixedNumbers.forEach(num => {
+            state.fixed.forEach(num => {
                 const tag = document.createElement('span');
                 tag.className = 'tag';
-                tag.innerHTML = `${num} <button class="remove-tag" data-num="${num}">✕</button>`;
-                fixasTags.appendChild(tag);
+                tag.innerHTML = `${num.toString().padStart(2, '0')} <button class="remove-tag" data-num="${num}">✕</button>`;
+                elements.tags.appendChild(tag);
             });
 
             document.querySelectorAll('.remove-tag').forEach(btn => {
-                btn.addEventListener('click', function(e) {
+                btn.addEventListener('click', function() {
                     const num = parseInt(this.dataset.num, 10);
-                    fixedNumbers = fixedNumbers.filter(n => n !== num);
+                    state.fixed = state.fixed.filter(n => n !== num);
                     renderFixas();
-                    validarFixas();
                 });
             });
-        }
+        };
 
-        // ----- Gerar jogos -----
-        function gerarJogos() {
-            if (!validarCampos()) return;
+        const adicionarFixas = () => {
+            const cfg = getConfig();
+            const raw = elements.fixasInput.value.trim();
+            if (!raw) return;
 
-            const config = getConfig();
-            const qtd = parseInt(qtdInput.value, 10);
-            const qtdJogos = parseInt(qtdJogosInput.value, 10);
+            const nums = raw.split(/[\s,;-]+/)
+                           .map(p => parseInt(p, 10))
+                           .filter(n => !isNaN(n) && n >= 1 && n <= cfg.total);
 
-            if (fixedNumbers.length > qtd) {
-                fixasError.textContent = `Fixas (${fixedNumbers.length}) > total (${qtd}).`;
+            if (!nums.length) {
+                errors.fixas.textContent = `Use valores de 1 a ${cfg.total}.`;
                 return;
             }
 
-            const jogos = [];
-            let falhou = false;
-            for (let i = 0; i < qtdJogos; i++) {
-                const dezenas = gerarDezenas(qtd, config.total);
-                if (!dezenas) {
-                    falhou = true;
-                    break;
+            let adicionadas = 0;
+            nums.forEach(n => {
+                if (!state.fixed.includes(n)) {
+                    state.fixed.push(n);
+                    adicionadas++;
                 }
-                const prob = calcularProbabilidade(qtd, config);
-                const stats = obterStats(dezenas);
-                jogos.push({ dezenas, prob, stats });
-            }
+            });
 
-            if (falhou || jogos.length === 0) {
-                alert('Erro ao gerar jogos. Verifique as dezenas fixas.');
+            state.fixed.sort((a, b) => a - b);
+            elements.fixasInput.value = '';
+            errors.fixas.textContent = '';
+            renderFixas();
+            
+            if (adicionadas > 0) showToast(`${adicionadas} dezena(s) adicionada(s)`);
+        };
+
+        const gerarJogos = () => {
+            const cfg = getConfig();
+            const qtd = parseInt(elements.qtd.value, 10);
+            const jogos = parseInt(elements.jogos.value, 10);
+
+            errors.qtd.textContent = '';
+            errors.jogos.textContent = '';
+            errors.fixas.textContent = '';
+
+            if (isNaN(qtd) || qtd < cfg.min || qtd > cfg.max) {
+                errors.qtd.textContent = `Inválido. Min: ${cfg.min}, Max: ${cfg.max}.`;
+                return;
+            }
+            if (isNaN(jogos) || jogos < 1 || jogos > 10) {
+                errors.jogos.textContent = 'Gere de 1 a 10 jogos.';
+                return;
+            }
+            if (state.fixed.length > qtd) {
+                errors.fixas.textContent = `Remova fixas. Máximo permitido: ${qtd}.`;
                 return;
             }
 
-            renderJogos(jogos, config);
-
-            jogos.forEach(j => {
-                history.push({
-                    numbers: j.dezenas.slice(),
-                    prob: j.prob,
-                    qtd: qtd,
-                    loteria: config.nome
+            const resultados = [];
+            for (let i = 0; i < jogos; i++) {
+                const dezenas = gerarDezenas(qtd, cfg.total);
+                if (!dezenas) return showToast('Erro ao gerar dezenas', 'error');
+                
+                resultados.push({
+                    dezenas,
+                    prob: calcularProbabilidade(qtd, cfg),
+                    stats: obterStats(dezenas)
                 });
-            });
+            }
+
+            renderJogos(resultados, cfg);
+            
+            resultados.forEach(r => state.history.push({ numbers: r.dezenas, prob: r.prob, name: cfg.nome }));
             renderHistory();
+            showToast(`${jogos} jogo(s) gerado(s) com sucesso!`);
+        };
 
-            fixasError.textContent = '';
-        }
-
-        function renderJogos(jogos, config) {
-            gameList.innerHTML = '';
-
-            jogos.forEach((jogo) => {
+        const renderJogos = (jogos, cfg) => {
+            elements.gameList.innerHTML = '';
+            jogos.forEach(jogo => {
                 const card = document.createElement('div');
                 card.className = 'game-card';
-
-                const numsDiv = document.createElement('div');
-                numsDiv.className = 'numbers';
-                jogo.dezenas.forEach(num => {
-                    const span = document.createElement('span');
-                    span.textContent = num.toString().padStart(2, '0');
-                    numsDiv.appendChild(span);
-                });
-                card.appendChild(numsDiv);
-
-                const statsDiv = document.createElement('div');
-                statsDiv.className = 'stats';
-                statsDiv.innerHTML = `
-                    <span><strong>Pares:</strong> ${jogo.stats.pares}</span>
-                    <span><strong>Ímpares:</strong> ${jogo.stats.impares}</span>
-                    <span><strong>Soma:</strong> ${jogo.stats.soma}</span>
-                    <span><strong>Intervalo:</strong> ${jogo.stats.intervalo}</span>
-                `;
-                card.appendChild(statsDiv);
-
-                const probDiv = document.createElement('div');
-                probDiv.className = 'prob';
-                const probStr = jogo.prob === Infinity ? 'Infinito' : `1 em ${formatNum(jogo.prob)}`;
-                probDiv.textContent = `🎯 Chance de acertar os ${config.premio} números: ${probStr}`;
-                card.appendChild(probDiv);
-
-                gameList.appendChild(card);
-            });
-
-            if (jogos.length === 0) {
-                gameList.innerHTML = '<div class="no-games">Nenhum jogo gerado.</div>';
-            }
-        }
-
-        // ----- Histórico de jogos gerados -----
-        function renderHistory() {
-            historyList.innerHTML = '';
-            if (history.length === 0) {
-                historyList.innerHTML = '<span style="color:#5a7a68;font-size:0.9rem;">Nenhum jogo no histórico.</span>';
-                return;
-            }
-
-            const reversed = history.slice().reverse().slice(0, 20);
-            reversed.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'history-item';
-                const numsStr = item.numbers.map(n => n.toString().padStart(2, '0')).join(' ');
-                const probStr = item.prob === Infinity ? '∞' : `1/${formatNum(item.prob)}`;
-                div.innerHTML = `
-                    <span class="h-nums">${numsStr}</span>
-                    <span class="h-prob">${item.loteria} – ${probStr}</span>
-                `;
-                historyList.appendChild(div);
-            });
-        }
-
-        function limparHistorico() {
-            history = [];
-            renderHistory();
-        }
-
-        // ----- Event listeners -----
-        loteriaSelect.addEventListener('change', function() {
-            currentLoteria = this.value;
-            fixedNumbers = [];
-            renderFixas();
-            atualizarPorLoteria();
-        });
-
-        addFixasBtn.addEventListener('click', adicionarFixas);
-        fixasInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                adicionarFixas();
-            }
-        });
-
-        gerarBtn.addEventListener('click', gerarJogos);
-        clearHistoryBtn.addEventListener('click', limparHistorico);
-
-        qtdInput.addEventListener('input', () => validarCampos());
-        qtdJogosInput.addEventListener('input', () => validarCampos());
-
-        carregarStatsBtn.addEventListener('click', carregarEstatisticas);
-
-        // ----- Inicialização -----
-        currentLoteria = loteriaSelect.value;
-        atualizarPorLoteria();
-        renderFixas();
-        renderHistory();
-        validarCampos();
-
-        // Carrega estatísticas automaticamente na primeira vez (opcional)
-        setTimeout(carregarEstatisticas, 300);
-
-    })();
-</script>
-
-</body>
-</html>
+                
+                const
