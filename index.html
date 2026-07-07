@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Loteria Inteligente + Estatísticas</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
     <style>
         :root {
             /* Cores padrão (Mega-Sena) */
@@ -18,6 +22,7 @@
             --text-muted: #5a7a68;
             --danger: #e74c3c;
             --info: #3498db;
+            --success: #27ae60;
         }
 
         * {
@@ -35,24 +40,17 @@
             justify-content: center;
             padding: 20px;
             color: var(--text-main);
-            /* Transição suave de fundo */
             transition: background 0.6s ease;
         }
 
         .container {
             max-width: 860px;
             width: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
             border-radius: 24px;
             padding: 32px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
         }
 
         h1 {
@@ -70,9 +68,8 @@
             color: var(--primary-light);
             margin-left: auto;
             background: var(--primary-pale);
-            padding: 4px 12px;
+            padding: 6px 14px;
             border-radius: 20px;
-            transition: all 0.4s ease;
         }
 
         .subtitle {
@@ -81,10 +78,8 @@
             border-left: 4px solid var(--primary-light);
             padding-left: 14px;
             font-weight: 400;
-            transition: border-color 0.4s ease;
         }
 
-        /* Formulário */
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -98,51 +93,27 @@
             gap: 6px;
         }
 
-        .field label {
-            font-weight: 600;
-            font-size: 0.9rem;
-            letter-spacing: 0.3px;
-        }
+        .field label { font-weight: 600; font-size: 0.9rem; letter-spacing: 0.3px; }
 
-        .field select,
-        .field input {
+        .field select, .field input {
             padding: 12px 14px;
             border: 2px solid #d0e0d6;
             border-radius: 12px;
             font-size: 1rem;
             background: #f9fbf9;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
             outline: none;
             width: 100%;
         }
 
-        .field select:focus,
-        .field input:focus {
+        .field select:focus, .field input:focus {
             border-color: var(--primary);
             background: white;
             box-shadow: 0 0 0 4px rgba(31, 139, 90, 0.15);
         }
 
-        .field input[type="number"] {
-            -moz-appearance: textfield;
-        }
-        .field input[type="number"]::-webkit-outer-spin-button,
-        .field input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        .field .helper {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .field .error-msg {
-            color: var(--danger);
-            font-size: 0.8rem;
-            font-weight: 600;
-            min-height: 1.2em;
-        }
+        .field .helper { font-size: 0.75rem; color: var(--text-muted); }
+        .field .error-msg { color: var(--danger); font-size: 0.8rem; font-weight: 600; min-height: 1.2em; }
 
         .fixas-area {
             grid-column: 1 / -1;
@@ -155,410 +126,110 @@
             border: 1px dashed #bdd3c5;
         }
 
-        .fixas-area .fixas-input-wrapper {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 10px;
-        }
-
+        .fixas-area .fixas-input-wrapper { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+        
         .fixas-area input {
-            flex: 1;
-            min-width: 180px;
-            padding: 12px 14px;
-            border: 2px solid #d0e0d6;
-            border-radius: 12px;
-            font-size: 1rem;
-            outline: none;
-        }
-
-        .fixas-area input:focus {
-            border-color: var(--primary);
+            flex: 1; min-width: 180px; padding: 12px 14px;
+            border: 2px solid #d0e0d6; border-radius: 12px;
+            font-size: 1rem; outline: none;
         }
 
         .btn-add {
-            background: var(--primary-light);
-            border: none;
-            color: white;
-            border-radius: 12px;
-            padding: 12px 20px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.4s ease;
+            background: var(--primary-light); border: none; color: white;
+            border-radius: 12px; padding: 12px 20px; font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease;
         }
 
-        .btn-add:hover {
-            background: var(--primary-dark);
-        }
-
-        .fixas-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 8px;
-        }
+        .fixas-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 
         .tag {
-            background: white;
-            border: 1px solid #bdd3c5;
-            border-radius: 20px;
-            padding: 4px 12px 4px 16px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            background: white; border: 1px solid #bdd3c5; border-radius: 20px;
+            padding: 6px 12px 6px 16px; font-size: 0.9rem; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 8px;
         }
 
-        .remove-tag {
-            cursor: pointer;
-            color: var(--danger);
-            font-weight: bold;
-            background: none;
-            border: none;
-            font-size: 1.1rem;
-        }
+        .remove-tag { cursor: pointer; color: var(--danger); font-weight: bold; background: none; border: none; font-size: 1.1rem; }
+
+        .actions-group { display: flex; gap: 12px; margin-top: 10px; flex-wrap: wrap; }
 
         .btn-generate {
-            width: 100%;
-            padding: 18px;
+            flex: 100%; padding: 18px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border: none;
-            border-radius: 16px;
-            color: white;
-            font-size: 1.2rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            transition: all 0.4s ease;
+            border: none; border-radius: 16px; color: white;
+            font-size: 1.2rem; font-weight: 700; cursor: pointer;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
 
-        .btn-generate:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+        .btn-export {
+            flex: 1; padding: 14px; background: white; border: 2px solid var(--primary);
+            border-radius: 16px; color: var(--primary-dark); font-size: 1rem; font-weight: 700;
+            cursor: pointer; transition: all 0.3s ease; display: none;
+            align-items: center; justify-content: center; gap: 8px;
         }
-        
-        .btn-generate:active {
-            transform: translateY(1px);
+
+        .btn-pdf {
+            border-color: var(--danger);
+            color: var(--danger);
         }
+
+        .btn-export.visible { display: flex; }
 
         /* Resultado dos jogos */
-        .result-area {
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 2px solid #eef4f0;
-        }
-
-        .game-list {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+        .result-area { margin-top: 32px; padding-top: 24px; border-top: 2px solid #eef4f0; }
+        .game-list { display: flex; flex-direction: column; gap: 20px; }
 
         .game-card {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            border: 1px solid #eef4f0;
-            border-left: 6px solid var(--primary);
-            position: relative;
-            animation: fadeIn 0.4s ease-out;
-            transition: border-color 0.4s ease;
+            background: white; border-radius: 16px; padding: 24px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); border: 1px solid #eef4f0;
+            border-left: 6px solid var(--primary); position: relative;
         }
 
-        /* Bolas de Loteria Adaptáveis */
-        .game-card .numbers {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
+        .game-card .numbers { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
         .game-card .numbers span {
             background: radial-gradient(circle at 30% 30%, #ffffff, var(--primary-pale));
-            width: 42px;
-            height: 42px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--text-main);
-            box-shadow: inset -2px -2px 6px rgba(0,0,0,0.05), 0 3px 6px rgba(0,0,0,0.1);
+            width: 46px; height: 46px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; font-size: 1.15rem; font-weight: 700; color: var(--text-main);
             border: 1px solid var(--primary-pale);
-            transition: all 0.4s ease;
         }
 
         .copy-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: #eef4f0;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--primary-dark);
-            cursor: pointer;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .copy-btn:hover {
-            background: #dceada;
-        }
-
-        .game-card .stats {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px 20px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            background: #f9fbf9;
-            padding: 10px 16px;
-            border-radius: 12px;
+            position: absolute; top: 20px; right: 20px; background: #eef4f0;
+            border: none; padding: 8px 14px; border-radius: 8px;
+            font-size: 0.85rem; font-weight: 600; color: var(--primary-dark); cursor: pointer;
         }
 
         .game-card .prob {
-            margin-top: 10px;
-            font-size: 0.9rem;
-            background: var(--primary-pale);
-            padding: 8px 16px;
-            border-radius: 8px;
-            display: inline-block;
-            font-weight: 600;
-            color: var(--primary-dark);
-            transition: all 0.4s ease;
+            margin-top: 12px; font-size: 0.9rem; background: var(--primary-pale);
+            padding: 10px 16px; border-radius: 8px; display: inline-block; font-weight: 600;
         }
 
-        .no-games {
-            text-align: center;
-            color: var(--text-muted);
-            padding: 20px;
-            font-style: italic;
-        }
+        .no-games { text-align: center; color: var(--text-muted); padding: 20px; font-style: italic; }
 
-        /* Histórico */
-        .history-area {
-            margin-top: 24px;
-            background: #f9fbf9;
-            padding: 16px;
-            border-radius: 16px;
+        .chart-container {
+            background: white; border-radius: 16px; padding: 20px;
+            border: 1px solid #eef4f0; margin-top: 16px;
         }
-        
-        .history-area summary {
-            cursor: pointer;
-            font-weight: 700;
-            color: var(--text-main);
-            list-style: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .history-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 16px;
-            max-height: 250px;
-            overflow-y: auto;
-        }
-        
-        .history-item {
-            background: white;
-            border-radius: 12px;
-            padding: 10px 16px;
-            font-size: 0.9rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid #eef4f0;
-            border-left: 4px solid var(--primary-light);
-            transition: border-color 0.4s ease;
-        }
-
-        .history-item .h-nums { font-weight: 700; letter-spacing: 1px; }
-        .history-item .h-prob { color: var(--text-muted); font-size: 0.8rem; }
-        
-        .history-clear {
-            background: none;
-            border: none;
-            color: var(--danger);
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 12px;
-            display: inline-block;
-        }
-
-        /* Estatísticas */
-        .stats-area {
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 2px solid #eef4f0;
-        }
-
-        .stats-header {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .btn-stats {
-            background: var(--text-main);
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-stats:hover { opacity: 0.9; transform: scale(1.02); }
-
-        .stats-summary {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            background: #f4f8f5;
-            padding: 16px;
-            border-radius: 16px;
-            margin-bottom: 20px;
-            font-size: 0.95rem;
-        }
-
-        .hot { color: var(--danger); font-weight: 800; }
-        .cold { color: var(--info); font-weight: 800; }
-
-        .table-wrapper {
-            max-height: 400px;
-            overflow-y: auto;
-            border-radius: 16px;
-            border: 1px solid #d0e0d6;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            text-align: left;
-        }
-
-        th {
-            background: var(--primary-pale);
-            color: var(--text-main);
-            font-weight: 700;
-            padding: 14px 16px;
-            position: sticky;
-            top: 0;
-            z-index: 2;
-            transition: background 0.4s ease;
-        }
-
-        td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #f0f4f2;
-            font-size: 0.95rem;
-        }
-
-        tr:hover td { background: #f9fbf9; }
-
-        .freq-bar {
-            display: inline-block;
-            height: 10px;
-            border-radius: 10px;
-            background: linear-gradient(90deg, var(--primary-light), var(--primary));
-            min-width: 4px;
-            transition: width 1s ease-out, background 0.4s ease;
-        }
-
-        .badge {
-            display: inline-block;
-            color: white;
-            border-radius: 12px;
-            padding: 2px 8px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            margin-left: 8px;
-        }
-        .hot-badge { background: var(--danger); }
-        .cold-badge { background: var(--info); }
 
         /* Toast Notificações */
-        #toast-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 9999;
-        }
-
-        .toast {
-            background: #333;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            animation: slideIn 0.3s ease-out forwards, fadeOut 0.3s ease-in 2.7s forwards;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .toast.success { background: var(--primary); }
+        #toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
+        .toast { background: #333; color: white; padding: 14px 24px; border-radius: 8px; font-weight: 600; }
+        .toast.success { background: var(--success); }
         .toast.error { background: var(--danger); }
-
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0;} to { transform: translateX(0); opacity: 1;} }
-        @keyframes fadeOut { from { transform: translateX(0); opacity: 1;} to { transform: translateX(100%); opacity: 0;} }
-
-        /* Responsividade */
-        @media (max-width: 600px) {
-            .container { padding: 20px; }
-            .form-grid { grid-template-columns: 1fr; gap: 16px; }
-            h1 { font-size: 1.5rem; flex-wrap: wrap; }
-            h1 small { margin-left: 0; width: 100%; text-align: center; margin-top: 8px; }
-            .game-card .numbers span { width: 36px; height: 36px; font-size: 1rem; }
-            .copy-btn { position: relative; top: 0; right: 0; width: 100%; justify-content: center; margin-top: 12px; }
-            .stats-header { flex-direction: column; align-items: stretch; }
-        }
-
-        /* Scrollbars customizadas */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f0f4f2; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: #a8c9b6; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--primary-light); }
+        .toast.info { background: var(--info); }
+        
+        /* Ocultar elementos na impressão do PDF */
+        .pdf-hide { display: none !important; }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="appContainer">
     <h1>
         🎯 Loteria
         <small>Inteligente + Estatísticas</small>
     </h1>
     <div class="subtitle">Gere jogos otimizados e consulte tendências matemáticas.</div>
 
-    <!-- FORMULÁRIO -->
     <div class="form-grid">
         <div class="field">
             <label for="loteriaSelect">Modalidade</label>
@@ -567,8 +238,6 @@
                 <option value="lotofacil">Lotofácil (25/15)</option>
                 <option value="quina">Quina (80/5)</option>
                 <option value="lotomania">Lotomania (100/20)</option>
-                <option value="duplasena">Dupla Sena (50/6)</option>
-                <option value="timemania">Timemania (80/10)</option>
             </select>
             <div class="helper" id="loteriaHelper">Selecione a loteria</div>
         </div>
@@ -583,7 +252,7 @@
         <div class="field" style="grid-column: 1 / -1;">
             <label for="qtdJogos">Quantidade de bilhetes (jogos)</label>
             <input type="number" id="qtdJogos" min="1" max="10" value="1" />
-            <div class="helper">Gere de 1 a 10 jogos simultaneamente</div>
+            <div class="helper">Gere de 1 a 100 jogos simultaneamente</div>
             <div class="error-msg" id="jogosError"></div>
         </div>
 
@@ -598,53 +267,29 @@
         </div>
     </div>
 
-    <button class="btn-generate" id="gerarBtn">🚀 Gerar Palpites</button>
+    <div class="actions-group">
+        <button class="btn-generate" id="gerarBtn">🚀 Gerar Palpites</button>
+        <button class="btn-export" id="exportBtn">💾 Salvar TXT</button>
+        <button class="btn-export btn-pdf" id="pdfBtn">📄 Salvar PDF</button>
+    </div>
 
-    <!-- RESULTADOS -->
     <div class="result-area" id="resultArea">
+        <div id="pdfHeader" style="display: none; margin-bottom: 20px;">
+            <h2>Resultados Gerados</h2>
+            <p>Data: <span id="pdfDate"></span></p>
+            <hr style="border: 1px solid #eef4f0; margin-top: 10px;">
+        </div>
         <div class="game-list" id="gameList">
             <div class="no-games">Aguardando geração de jogos...</div>
         </div>
     </div>
 
-    <!-- HISTÓRICO -->
-    <div class="history-area">
-        <details>
-            <summary>📋 Histórico de Palpites Gerados</summary>
-            <div class="history-list" id="historyList">
-                <span class="no-games">Nenhum jogo no histórico.</span>
-            </div>
-            <button class="history-clear" id="clearHistoryBtn">Limpar Histórico</button>
-        </details>
-    </div>
-
-    <!-- ESTATÍSTICAS -->
-    <div class="stats-area" id="statsArea">
-        <div class="stats-header">
-            <h3>📊 Mapa de Frequência (Simulação)</h3>
-            <button class="btn-stats" id="carregarStatsBtn">
-                <span>🔄 Analisar 100 Concursos</span>
-            </button>
-        </div>
-
-        <div class="stats-summary" id="statsSummary">
-            <span>Aguardando análise de dados...</span>
-        </div>
-
-        <div class="table-wrapper" id="statsTableWrapper">
-            <table id="statsTable">
-                <thead>
-                    <tr>
-                        <th>Nº</th>
-                        <th>Aparições</th>
-                        <th>Prob. (%)</th>
-                        <th>Gráfico</th>
-                    </tr>
-                </thead>
-                <tbody id="statsBody">
-                    <tr><td colspan="4" class="no-games">Clique no botão acima para rodar a simulação estatística.</td></tr>
-                </tbody>
-            </table>
+    <div class="result-area" style="border-top: 2px solid #eef4f0;">
+        <h3 style="margin-bottom: 8px;">📈 Evolução Anual de Prêmios</h3>
+        <p class="subtitle" style="margin-bottom: 16px;">Simulação do volume histórico de prêmios pagos ao longo de um ano civil (em Milhões de R$).</p>
+        
+        <div class="chart-container">
+            <canvas id="premiosChart" height="120"></canvas>
         </div>
     </div>
 </div>
@@ -655,32 +300,11 @@
     (function() {
         "use strict";
 
-        // ----- PALETA DE CORES DINÂMICA -----
         const LOTERIAS = {
-            megasena:   { 
-                nome: 'Mega-Sena', total: 60, min: 6, max: 20, premio: 6,
-                cores: { main: '#1f8b5a', dark: '#146a44', light: '#2e7d5e', bg: '#0b2b1e', text: '#1e3b2a', pale: '#e6f0ea' }
-            },
-            lotofacil:  { 
-                nome: 'Lotofácil', total: 25, min: 15, max: 20, premio: 15,
-                cores: { main: '#b32882', dark: '#8a1e64', light: '#cc499f', bg: '#360c27', text: '#3b1a2d', pale: '#f5e4ef' }
-            },
-            quina:      { 
-                nome: 'Quina', total: 80, min: 5, max: 15, premio: 5,
-                cores: { main: '#3a358c', dark: '#292566', light: '#544ea6', bg: '#111029', text: '#1a1936', pale: '#e8e7f2' }
-            },
-            lotomania:  { 
-                nome: 'Lotomania', total: 100, min: 20, max: 50, premio: 20,
-                cores: { main: '#e67e22', dark: '#c0392b', light: '#f39c12', bg: '#3e2008', text: '#4a2c11', pale: '#fdf2e9' }
-            },
-            duplasena:  { 
-                nome: 'Dupla Sena', total: 50, min: 6, max: 15, premio: 6,
-                cores: { main: '#b8223f', dark: '#8f182f', light: '#d13b58', bg: '#3b0913', text: '#45131d', pale: '#f7e6e9' }
-            },
-            timemania:  { 
-                nome: 'Timemania', total: 80, min: 10, max: 20, premio: 10,
-                cores: { main: '#008f44', dark: '#006b33', light: '#15ab5b', bg: '#002913', text: '#0b361d', pale: '#e6f2eb' }
-            }
+            megasena:   { nome: 'Mega-Sena', total: 60, min: 6, max: 20, premio: 6, cores: { main: '#1f8b5a', dark: '#146a44', light: '#2e7d5e', bg: '#0b2b1e', text: '#1e3b2a', pale: '#e6f0ea' } },
+            lotofacil:  { nome: 'Lotofácil', total: 25, min: 15, max: 20, premio: 15, cores: { main: '#b32882', dark: '#8a1e64', light: '#cc499f', bg: '#360c27', text: '#3b1a2d', pale: '#f5e4ef' } },
+            quina:      { nome: 'Quina', total: 80, min: 5, max: 15, premio: 5, cores: { main: '#3a358c', dark: '#292566', light: '#544ea6', bg: '#111029', text: '#1a1936', pale: '#e8e7f2' } },
+            lotomania:  { nome: 'Lotomania', total: 100, min: 20, max: 50, premio: 20, cores: { main: '#e67e22', dark: '#c0392b', light: '#f39c12', bg: '#3e2008', text: '#4a2c11', pale: '#fdf2e9' } }
         };
 
         const elements = {
@@ -691,12 +315,12 @@
             btnAdd: document.getElementById('addFixasBtn'),
             tags: document.getElementById('fixasTags'),
             btnGerar: document.getElementById('gerarBtn'),
+            btnExport: document.getElementById('exportBtn'),
+            btnPdf: document.getElementById('pdfBtn'),
             gameList: document.getElementById('gameList'),
-            historyList: document.getElementById('historyList'),
-            btnClearHistory: document.getElementById('clearHistoryBtn'),
-            btnStats: document.getElementById('carregarStatsBtn'),
-            statsBody: document.getElementById('statsBody'),
-            statsSummary: document.getElementById('statsSummary'),
+            resultArea: document.getElementById('resultArea'),
+            pdfHeader: document.getElementById('pdfHeader'),
+            pdfDate: document.getElementById('pdfDate'),
             toastContainer: document.getElementById('toast-container')
         };
 
@@ -706,40 +330,100 @@
             fixas: document.getElementById('fixasError')
         };
 
-        let state = {
-            fixed: [],
-            history: [],
-            loteria: 'megasena'
+        let state = { fixed: [], currentGames: [], loteria: 'megasena' };
+        let currentChart = null;
+
+        // --- Gráfico Chart.js ---
+        const renderizarGrafico = () => {
+            const ctx = document.getElementById('premiosChart').getContext('2d');
+            const cores = getConfig().cores;
+            
+            const dadosLoterias = {
+                megasena: [50, 45, 120, 60, 55, 70, 80, 50, 45, 90, 85, 450],
+                lotofacil: [80, 85, 82, 80, 85, 88, 80, 85, 200, 80, 85, 80],
+                quina: [40, 45, 42, 40, 45, 210, 42, 40, 45, 42, 40, 45],
+                lotomania: [30, 32, 35, 30, 32, 35, 30, 31, 35, 30, 32, 40]
+            };
+
+            if (currentChart) currentChart.destroy();
+
+            currentChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                    datasets: [{
+                        label: `Prêmios Pagos (Milhões R$)`,
+                        data: dadosLoterias[state.loteria],
+                        backgroundColor: cores.main,
+                        borderRadius: 6,
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+            });
         };
 
         // --- Utils ---
         const showToast = (msg, type = 'success') => {
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
-            toast.innerHTML = type === 'success' ? `✅ ${msg}` : `⚠️ ${msg}`;
+            toast.innerHTML = msg;
             elements.toastContainer.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+            setTimeout(() => toast.remove(), 4000);
         };
 
-        const copyToClipboard = async (text) => {
-            try {
-                await navigator.clipboard.writeText(text);
-                showToast('Números copiados com sucesso!');
-            } catch (err) {
-                showToast('Erro ao copiar números.', 'error');
-            }
+        const exportToTxt = () => {
+            const cfg = getConfig();
+            let txtContent = `=== JOGOS: ${cfg.nome.toUpperCase()} ===\n\n`;
+            state.currentGames.forEach((jogo, i) => {
+                txtContent += `Jogo ${String(i + 1).padStart(2, '0')}: [ ${jogo.dezenas.join(' - ')} ]\n`;
+            });
+            const blob = new Blob([txtContent], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = `jogos_${state.loteria}.txt`; a.click();
+            URL.revokeObjectURL(url);
+            showToast('✅ Arquivo TXT baixado!');
+        };
+
+        // --- LÓGICA DE GERAÇÃO DE PDF ---
+        const exportToPdf = () => {
+            if (state.currentGames.length === 0) return showToast('⚠️ Nenhum jogo gerado.', 'error');
+            
+            showToast('⏳ Preparando PDF...', 'info');
+
+            // Prepara a área ocultando os botões de copiar
+            document.querySelectorAll('.copy-btn').forEach(btn => btn.classList.add('pdf-hide'));
+            elements.pdfHeader.style.display = 'block';
+            elements.pdfDate.textContent = new Date().toLocaleString('pt-BR');
+
+            const elementoParaExportar = elements.resultArea;
+            const cfg = getConfig();
+
+            const opt = {
+                margin:       10,
+                filename:     `jogos_${state.loteria}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Gera o PDF e restaura a interface
+            html2pdf().set(opt).from(elementoParaExportar).save().then(() => {
+                document.querySelectorAll('.copy-btn').forEach(btn => btn.classList.remove('pdf-hide'));
+                elements.pdfHeader.style.display = 'none';
+                showToast('✅ PDF baixado com sucesso!');
+            }).catch(() => {
+                document.querySelectorAll('.copy-btn').forEach(btn => btn.classList.remove('pdf-hide'));
+                elements.pdfHeader.style.display = 'none';
+                showToast('⚠️ Erro ao gerar PDF', 'error');
+            });
         };
 
         const combinacao = (n, r) => {
             if (r < 0 || r > n) return 0;
-            let res = 1;
-            for (let i = 1; i <= r; i++) res = res * (n - r + i) / i;
+            let res = 1; for (let i = 1; i <= r; i++) res = res * (n - r + i) / i;
             return Math.round(res);
         };
 
-        const formatNum = num => Math.round(num).toLocaleString('pt-BR');
-
-        // --- Lógica Principal ---
         const getConfig = () => LOTERIAS[state.loteria];
 
         const aplicarTema = () => {
@@ -749,75 +433,31 @@
             root.style.setProperty('--primary-dark', cores.dark);
             root.style.setProperty('--primary-light', cores.light);
             root.style.setProperty('--bg-color', cores.bg);
-            root.style.setProperty('--text-main', cores.text);
             root.style.setProperty('--primary-pale', cores.pale);
+            renderizarGrafico();
         };
 
-        const gerarDezenas = (qtd, total) => {
-            let selected = [...state.fixed];
-            if (selected.length > qtd) return null;
-            
-            while (selected.length < qtd) {
-                const n = Math.floor(Math.random() * total) + 1;
-                if (!selected.includes(n)) selected.push(n);
-            }
-            return selected.sort((a, b) => a - b);
-        };
-
-        const calcularProbabilidade = (qtd, config) => {
-            const { total, premio } = config;
-            if (qtd < premio) return Infinity;
-            const tComb = combinacao(total, premio);
-            const eComb = combinacao(qtd, premio);
-            return eComb === 0 ? Infinity : tComb / eComb;
-        };
-
-        const obterStats = dezenas => {
-            const pares = dezenas.filter(d => d % 2 === 0).length;
-            return {
-                pares,
-                impares: dezenas.length - pares,
-                soma: dezenas.reduce((a, b) => a + b, 0),
-                intervalo: dezenas[dezenas.length - 1] - dezenas[0]
-            };
-        };
-
-        // --- Renderização ---
         const atualizarInterface = () => {
             const cfg = getConfig();
             aplicarTema();
-
-            elements.qtd.min = cfg.min;
-            elements.qtd.max = cfg.max;
+            elements.qtd.min = cfg.min; elements.qtd.max = cfg.max;
             elements.qtd.value = Math.min(Math.max(elements.qtd.value || cfg.min, cfg.min), cfg.max);
-            
             document.getElementById('qtdHelper').textContent = `Mínimo ${cfg.min}, máximo ${cfg.max}`;
-            document.getElementById('loteriaHelper').textContent = `Total: ${cfg.total} bolas | Acertos para prêmio: ${cfg.premio}`;
             elements.fixasInput.placeholder = `Valores de 1 a ${cfg.total}`;
-            
-            elements.statsBody.innerHTML = `<tr><td colspan="4" class="no-games">Clique no botão acima para rodar a simulação.</td></tr>`;
-            elements.statsSummary.innerHTML = `<span>Aguardando análise de dados...</span>`;
-            
             renderFixas();
         };
 
         const renderFixas = () => {
             elements.tags.innerHTML = '';
-            if (!state.fixed.length) {
-                elements.tags.innerHTML = '<span class="no-games" style="padding:0; font-size:0.85rem">Nenhuma fixa adicionada</span>';
-                return;
-            }
+            if (!state.fixed.length) { elements.tags.innerHTML = '<span class="no-games" style="padding:0; font-size:0.85rem">Nenhuma fixa</span>'; return; }
             state.fixed.forEach(num => {
-                const tag = document.createElement('span');
-                tag.className = 'tag';
+                const tag = document.createElement('span'); tag.className = 'tag';
                 tag.innerHTML = `${num.toString().padStart(2, '0')} <button class="remove-tag" data-num="${num}">✕</button>`;
                 elements.tags.appendChild(tag);
             });
-
             document.querySelectorAll('.remove-tag').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    const num = parseInt(this.dataset.num, 10);
-                    state.fixed = state.fixed.filter(n => n !== num);
+                    state.fixed = state.fixed.filter(n => n !== parseInt(this.dataset.num, 10));
                     renderFixas();
                 });
             });
@@ -827,200 +467,71 @@
             const cfg = getConfig();
             const raw = elements.fixasInput.value.trim();
             if (!raw) return;
-
-            const nums = raw.split(/[\s,;-]+/)
-                           .map(p => parseInt(p, 10))
-                           .filter(n => !isNaN(n) && n >= 1 && n <= cfg.total);
-
-            if (!nums.length) {
-                errors.fixas.textContent = `Use valores de 1 a ${cfg.total}.`;
-                return;
-            }
-
-            let adicionadas = 0;
-            nums.forEach(n => {
-                if (!state.fixed.includes(n)) {
-                    state.fixed.push(n);
-                    adicionadas++;
-                }
-            });
-
+            const nums = raw.split(/[\s,;-]+/).map(p => parseInt(p, 10)).filter(n => !isNaN(n) && n >= 1 && n <= cfg.total);
+            nums.forEach(n => { if (!state.fixed.includes(n)) state.fixed.push(n); });
             state.fixed.sort((a, b) => a - b);
-            elements.fixasInput.value = '';
-            errors.fixas.textContent = '';
-            renderFixas();
-            
-            if (adicionadas > 0) showToast(`${adicionadas} dezena(s) adicionada(s)`);
+            elements.fixasInput.value = ''; errors.fixas.textContent = ''; renderFixas();
         };
 
         const gerarJogos = () => {
             const cfg = getConfig();
             const qtd = parseInt(elements.qtd.value, 10);
             const jogos = parseInt(elements.jogos.value, 10);
-
-            errors.qtd.textContent = '';
-            errors.jogos.textContent = '';
-            errors.fixas.textContent = '';
-
-            if (isNaN(qtd) || qtd < cfg.min || qtd > cfg.max) {
-                errors.qtd.textContent = `Inválido. Min: ${cfg.min}, Max: ${cfg.max}.`;
-                return;
-            }
-            if (isNaN(jogos) || jogos < 1 || jogos > 10) {
-                errors.jogos.textContent = 'Gere de 1 a 10 jogos.';
-                return;
-            }
-            if (state.fixed.length > qtd) {
-                errors.fixas.textContent = `Remova fixas. Máximo permitido: ${qtd}.`;
-                return;
-            }
+            if (state.fixed.length > qtd) return errors.fixas.textContent = 'Muitas fixas.';
 
             const resultados = [];
             for (let i = 0; i < jogos; i++) {
-                const dezenas = gerarDezenas(qtd, cfg.total);
-                if (!dezenas) return showToast('Erro ao gerar dezenas', 'error');
-                
+                let selected = [...state.fixed];
+                while (selected.length < qtd) {
+                    const n = Math.floor(Math.random() * cfg.total) + 1;
+                    if (!selected.includes(n)) selected.push(n);
+                }
                 resultados.push({
-                    dezenas,
-                    prob: calcularProbabilidade(qtd, cfg),
-                    stats: obterStats(dezenas)
+                    dezenas: selected.sort((a, b) => a - b),
+                    prob: combinacao(cfg.total, cfg.premio) / (combinacao(qtd, cfg.premio) || 1)
                 });
             }
-
-            renderJogos(resultados, cfg);
-            
-            resultados.forEach(r => state.history.push({ numbers: r.dezenas, prob: r.prob, name: cfg.nome }));
-            renderHistory();
-            showToast(`${jogos} jogo(s) gerado(s) com sucesso!`);
+            state.currentGames = resultados;
+            renderJogos(resultados);
+            elements.btnExport.classList.add('visible');
+            elements.btnPdf.classList.add('visible');
         };
 
-        const renderJogos = (jogos, cfg) => {
+        const renderJogos = (jogos) => {
             elements.gameList.innerHTML = '';
-            jogos.forEach(jogo => {
-                const card = document.createElement('div');
-                card.className = 'game-card';
-                
-                const numStrFormatado = jogo.dezenas.map(n => n.toString().padStart(2, '0')).join(' - ');
-
+            jogos.forEach((jogo) => {
+                const card = document.createElement('div'); card.className = 'game-card';
                 let html = `<div class="numbers">`;
-                jogo.dezenas.forEach(n => {
-                    html += `<span>${n.toString().padStart(2, '0')}</span>`;
-                });
+                jogo.dezenas.forEach(n => html += `<span>${n.toString().padStart(2, '0')}</span>`);
                 html += `</div>
-                         <button class="copy-btn" data-nums="${numStrFormatado}">📋 Copiar Jogo</button>
-                         <div class="stats">
-                             <span><strong>Pares:</strong> ${jogo.stats.pares}</span>
-                             <span><strong>Ímpares:</strong> ${jogo.stats.impares}</span>
-                             <span><strong>Soma:</strong> ${jogo.stats.soma}</span>
-                             <span><strong>Amplitude:</strong> ${jogo.stats.intervalo}</span>
-                         </div>
-                         <div class="prob">🎯 Chance de prêmio máximo: 1 em ${formatNum(jogo.prob)}</div>`;
-                
+                         <button class="copy-btn" data-nums="${jogo.dezenas.join(' - ')}">📋 Copiar Jogo</button>
+                         <div class="prob">🎯 1 em ${Math.round(jogo.prob).toLocaleString('pt-BR')}</div>`;
                 card.innerHTML = html;
                 elements.gameList.appendChild(card);
             });
-
+            
             document.querySelectorAll('.copy-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => copyToClipboard(e.target.dataset.nums));
+                btn.addEventListener('click', async (e) => {
+                    await navigator.clipboard.writeText(e.target.dataset.nums);
+                    showToast('✅ Números copiados!');
+                });
             });
-        };
-
-        const renderHistory = () => {
-            elements.historyList.innerHTML = '';
-            if (!state.history.length) {
-                elements.historyList.innerHTML = '<span class="no-games">Nenhum jogo no histórico.</span>';
-                return;
-            }
-            
-            [...state.history].reverse().slice(0, 15).forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'history-item';
-                div.innerHTML = `
-                    <span class="h-nums">${item.numbers.map(n => n.toString().padStart(2, '0')).join(' ')}</span>
-                    <span class="h-prob">${item.name}</span>
-                `;
-                elements.historyList.appendChild(div);
-            });
-        };
-
-        const simularEstatisticas = () => {
-            const cfg = getConfig();
-            const freq = new Array(cfg.total).fill(0);
-            
-            elements.btnStats.innerHTML = '⏳ Calculando...';
-            elements.btnStats.disabled = true;
-
-            setTimeout(() => {
-                // Simulação com leve viés aleatório para dados mais "reais"
-                for(let i=0; i<100; i++){
-                    let sorteio = new Set();
-                    while(sorteio.size < cfg.premio) {
-                        sorteio.add(Math.floor(Math.random() * cfg.total) + 1);
-                    }
-                    sorteio.forEach(num => freq[num - 1]++);
-                }
-
-                const dados = freq.map((count, i) => ({
-                    num: i + 1,
-                    count,
-                    perc: (count / (100 * cfg.premio)) * 100
-                })).sort((a, b) => b.count - a.count);
-
-                const max = dados[0].count;
-                const min = dados[dados.length-1].count;
-                
-                const topNums = dados.filter(d => d.count === max).map(d => d.num);
-                const botNums = dados.filter(d => d.count === min).map(d => d.num);
-
-                elements.statsSummary.innerHTML = `
-                    <span><strong>🔥 Quentes (${max}x):</strong> <span class="hot">${topNums.join(', ')}</span></span>
-                    <span><strong>❄️ Frios (${min}x):</strong> <span class="cold">${botNums.join(', ')}</span></span>
-                `;
-
-                const top5 = dados.slice(0, 5).map(d => d.num);
-                const bot5 = dados.slice(-5).map(d => d.num);
-
-                elements.statsBody.innerHTML = dados.map(d => {
-                    const isHot = top5.includes(d.num);
-                    const isCold = bot5.includes(d.num);
-                    const badge = isHot ? '<span class="badge hot-badge">Alta</span>' : (isCold ? '<span class="badge cold-badge">Baixa</span>' : '');
-                    const barW = Math.max(2, (d.count / max) * 100);
-
-                    return `
-                        <tr>
-                            <td><strong>${d.num.toString().padStart(2, '0')}</strong> ${badge}</td>
-                            <td>${d.count}</td>
-                            <td>${d.perc.toFixed(2)}%</td>
-                            <td style="width: 40%;"><div class="freq-bar" style="width: ${barW}%"></div></td>
-                        </tr>
-                    `;
-                }).join('');
-
-                elements.btnStats.innerHTML = '🔄 Refazer Simulação';
-                elements.btnStats.disabled = false;
-                showToast('Análise de 100 concursos concluída!');
-            }, 600);
         };
 
         // --- Eventos ---
         elements.select.addEventListener('change', (e) => {
-            state.loteria = e.target.value;
-            state.fixed = [];
+            state.loteria = e.target.value; state.fixed = []; state.currentGames = [];
+            elements.gameList.innerHTML = '<div class="no-games">Aguardando geração...</div>';
+            elements.btnExport.classList.remove('visible'); 
+            elements.btnPdf.classList.remove('visible'); 
             atualizarInterface();
         });
-
-        elements.btnAdd.addEventListener('click', adicionarFixas);
-        elements.fixasInput.addEventListener('keypress', e => { if (e.key === 'Enter') adicionarFixas(); });
-        elements.btnGerar.addEventListener('click', gerarJogos);
-        elements.btnStats.addEventListener('click', simularEstatisticas);
         
-        elements.btnClearHistory.addEventListener('click', () => {
-            state.history = [];
-            renderHistory();
-            showToast('Histórico limpo.');
-        });
+        elements.btnAdd.addEventListener('click', adicionarFixas);
+        elements.btnGerar.addEventListener('click', gerarJogos);
+        elements.btnExport.addEventListener('click', exportToTxt);
+        elements.btnPdf.addEventListener('click', exportToPdf);
 
-        // Start
         atualizarInterface();
     })();
 </script>
